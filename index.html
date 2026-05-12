@@ -1,0 +1,712 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>阜平县 OECM 规划工具包｜4×4 交互矩阵</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap');
+  :root {
+    --c1:#3d6b35; --c1-light:#e8f2e5; --c1-mid:#c2dbb9;
+    --c2:#6a9e56; --c2-light:#eef6e9; --c2-mid:#cfe5c4;
+    --c3:#c4834a; --c3-light:#faf0e6; --c3-mid:#eecfb0;
+    --c4:#b05878; --c4-light:#faecf1; --c4-mid:#e8bece;
+    --paper:#f5f3ee; --card:#fffdf8; --text:#1b1b1b; --muted:#666;
+    --border:#d7d1c4;
+  }
+  * { box-sizing:border-box; }
+  body {
+    margin:0; padding:32px 24px 48px;
+    background:
+      radial-gradient(circle at 18% 4%, rgba(61,107,53,.08), transparent 28%),
+      radial-gradient(circle at 82% 14%, rgba(176,88,120,.08), transparent 30%),
+      var(--paper);
+    color:var(--text);
+    font-family:'Noto Sans SC','Microsoft YaHei',Arial,sans-serif;
+    min-width:1180px;
+  }
+  .page { max-width:1480px; margin:0 auto; }
+  .header {
+    display:flex; justify-content:space-between; align-items:flex-end;
+    gap:24px; margin-bottom:22px; padding-left:18px; border-left:5px solid var(--c1);
+  }
+  .header-tag {
+    font-size:12px; font-weight:700; letter-spacing:2.4px; color:var(--c1);
+    text-transform:uppercase; margin-bottom:6px;
+  }
+  h1 {
+    font-family:'Noto Serif SC',serif; font-size:30px; line-height:1.25; margin:0 0 8px;
+  }
+  .intro { font-size:14px; color:var(--muted); line-height:1.8; max-width:780px; margin:0; }
+  .hint {
+    font-size:13px; color:#7d756b; background:#fffdf8; border:1px solid var(--border);
+    border-radius:999px; padding:10px 16px; box-shadow:0 10px 30px rgba(0,0,0,.05);
+    white-space:nowrap;
+  }
+  .axis-x-label {
+    margin:24px 0 5px 86px; text-align:center; font-size:13px; color:#777; font-weight:700; letter-spacing:1.2px;
+  }
+  .axis-x {
+    display:grid; grid-template-columns:72px 1fr; gap:8px; align-items:center; margin-bottom:8px;
+  }
+  .axis-x .arrow {
+    display:flex; align-items:center; gap:10px; padding:0 10px; color:#888; font-size:12px; font-weight:700;
+  }
+  .axis-x .line {
+    height:2px; background:linear-gradient(to right,var(--c1),var(--c2),var(--c3),var(--c4)); flex:1; position:relative; border-radius:999px;
+  }
+  .axis-x .line::after {
+    content:""; position:absolute; right:-2px; top:50%; transform:translateY(-50%);
+    border-left:8px solid var(--c4); border-top:5px solid transparent; border-bottom:5px solid transparent;
+  }
+  .matrix-wrap {
+    display:grid; grid-template-columns:44px 1fr; gap:12px; align-items:stretch;
+  }
+  .axis-y {
+    writing-mode:vertical-rl; text-orientation:mixed;
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    color:#777; font-weight:700; font-size:13px; letter-spacing:1.4px;
+  }
+  .axis-y .vline {
+    width:2px; height:100%; min-height:620px;
+    background:linear-gradient(to bottom,#4a6741,#3f6275,#7a7040,#6b5845);
+    border-radius:999px; margin:10px 0;
+  }
+  .matrix {
+    display:grid;
+    grid-template-columns:72px repeat(4, minmax(230px, 1fr));
+    grid-template-rows:auto repeat(4, minmax(226px, auto));
+    gap:7px;
+  }
+  .corner {
+    border-radius:10px; border:1px dashed #cfc8bc; background:rgba(255,253,248,.55);
+    display:flex; align-items:center; justify-content:center; color:#aaa; font-size:11px;
+  }
+  .col-header {
+    background:var(--accent); color:white; border-radius:12px; padding:14px 10px; text-align:center;
+    min-height:92px; display:flex; flex-direction:column; justify-content:center;
+    box-shadow:0 10px 22px rgba(0,0,0,.08);
+  }
+  .qtype { font-size:11px; opacity:.86; letter-spacing:.5px; margin-bottom:5px; }
+  .qlabel { font-family:'Noto Serif SC',serif; font-size:18px; font-weight:700; line-height:1.28; }
+  .qsub { font-size:11px; opacity:.86; margin-top:5px; }
+  .row-header {
+    background:var(--row); color:white; border-radius:12px; min-height:226px;
+    display:flex; align-items:center; justify-content:center; padding:12px 6px;
+    box-shadow:0 10px 22px rgba(0,0,0,.06);
+  }
+  .row-header span {
+    writing-mode:vertical-rl; text-orientation:mixed; font-family:'Noto Serif SC',serif;
+    font-size:16px; font-weight:700; letter-spacing:4px;
+  }
+  .unit-card {
+    border:1.5px solid transparent; border-radius:12px; padding:10px;
+    background:#fff; cursor:pointer; text-align:left; overflow:hidden;
+    transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    box-shadow:0 8px 24px rgba(0,0,0,.05);
+    display:flex; flex-direction:column; gap:8px;
+  }
+  .unit-card:hover {
+    transform:translateY(-3px);
+    box-shadow:0 16px 36px rgba(0,0,0,.12);
+  }
+  .cell-1 { background:var(--c1-light); border-color:var(--c1-mid); }
+  .cell-2 { background:var(--c2-light); border-color:var(--c2-mid); }
+  .cell-3 { background:var(--c3-light); border-color:var(--c3-mid); }
+  .cell-4 { background:var(--c4-light); border-color:var(--c4-mid); }
+  .thumb-wrap {
+    width:100%; aspect-ratio:4/3; background:#fffdf8; border-radius:10px; overflow:hidden;
+    border:1px solid rgba(0,0,0,.08);
+  }
+  .thumb-wrap img { width:100%; height:100%; object-fit:cover; display:block; }
+  .unit-info { padding:2px 2px 0; }
+  .unit-name {
+    font-family:'Noto Serif SC',serif; font-size:17px; font-weight:700; margin-bottom:4px; color:#25221e;
+  }
+  .unit-tags { color:#6a625a; font-size:12px; line-height:1.5; }
+  .legend {
+    display:flex; gap:18px; flex-wrap:wrap; margin:20px 0 0 86px;
+    font-size:12px; color:#666; align-items:center;
+  }
+  .legend-item { display:flex; align-items:center; gap:7px; }
+  .dot { width:12px; height:12px; border-radius:3px; display:inline-block; }
+  .footnote {
+    margin:16px 0 0 86px; padding-top:12px; border-top:1px solid #ddd5c8;
+    color:#8a8178; font-size:12px; line-height:1.8;
+  }
+
+  dialog {
+    width:min(1060px, calc(100vw - 64px));
+    border:none; border-radius:24px; padding:0; background:#fffdf8;
+    box-shadow:0 30px 90px rgba(0,0,0,.28); overflow:hidden;
+  }
+  dialog::backdrop { background:rgba(30,28,25,.45); backdrop-filter:blur(5px); }
+  .modal {
+    display:grid; grid-template-columns:1.08fr .92fr; min-height:560px;
+  }
+  .modal-visual {
+    background:#f5f3ee; padding:22px; border-right:1px solid #e2dbce; display:flex; align-items:center;
+  }
+  .modal-visual img {
+    width:100%; border-radius:18px; box-shadow:0 18px 44px rgba(0,0,0,.13); border:1px solid #ddd3c4;
+  }
+  .modal-text { padding:34px 34px 28px; position:relative; }
+  .close {
+    position:absolute; top:18px; right:18px; width:38px; height:38px;
+    border:none; border-radius:50%; background:#f1ece3; color:#665c52; font-size:22px;
+    cursor:pointer;
+  }
+  .modal-kicker { font-size:12px; letter-spacing:1.6px; font-weight:700; color:var(--modal-color); margin-bottom:9px; }
+  .modal-title {
+    font-family:'Noto Serif SC',serif; font-size:30px; margin:0 48px 10px 0; line-height:1.25;
+    color:#201f1c;
+  }
+  .modal-sub { color:#666; font-size:14px; line-height:1.7; margin-bottom:20px; }
+  .measure-title { font-weight:700; color:#333; margin:24px 0 10px; }
+  .measure-list { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:12px; }
+  .measure-list li {
+    position:relative; padding:13px 14px 13px 36px; border-radius:14px;
+    background:#faf7f0; border:1px solid #e5dccf; color:#444; line-height:1.72; font-size:14px;
+  }
+  .measure-list li::before {
+    content:""; position:absolute; left:15px; top:22px; width:8px; height:8px; border-radius:50%;
+    background:var(--modal-color);
+  }
+  .modal-footer {
+    margin-top:20px; padding:13px 15px; border-radius:14px;
+    background:color-mix(in srgb, var(--modal-color) 9%, white);
+    color:#5b554e; font-size:13px; line-height:1.7;
+  }
+  @media (max-width: 900px) {
+    body { min-width:0; padding:20px 14px; }
+    .header { display:block; }
+    .hint { display:inline-block; margin-top:14px; white-space:normal; }
+    .axis-x-label,.legend,.footnote { margin-left:0; }
+    .matrix-wrap { grid-template-columns:1fr; }
+    .axis-y { writing-mode:horizontal-tb; }
+    .axis-y .vline { display:none; }
+    .matrix { grid-template-columns:1fr; grid-template-rows:auto; }
+    .corner,.col-header,.row-header { display:none; }
+    .modal { grid-template-columns:1fr; }
+    .modal-visual { border-right:none; border-bottom:1px solid #e2dbce; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="header">
+    <div>
+      <div class="header-tag">阜平县 · OECM 规划工具包</div>
+      <h1>潜力 OECM 分区管控矩阵</h1>
+      <p class="intro">依据生态保护价值—经济发展潜力象限与 OECM 地类类型双轴分类体系，形成 16 类管控单元。点击任一工具包轴测图，可展开原始详细管控措施与活动展望。</p>
+    </div>
+    <div class="hint">点击 16 个工具包卡片查看详细说明</div>
+  </header>
+
+  <div class="axis-x-label">经济发展潜力 →</div>
+  <div class="axis-x">
+    <div></div>
+    <div class="arrow">
+      <span style="color:#3d6b35;">低发展潜力</span>
+      <div class="line"></div>
+      <span style="color:#b05878;">高发展潜力</span>
+    </div>
+  </div>
+
+  <main class="matrix-wrap">
+    <aside class="axis-y">
+      <span>OECM 地类类型</span>
+      <span class="vline"></span>
+    </aside>
+    <section class="matrix">
+      <div class="corner">双轴分类</div>
+      
+  <div class="col-header" style="--accent:#3d6b35">
+    <div class="qtype">象限 I · 主要OECM</div>
+    <div class="qlabel">高保护<br>低发展</div>
+    <div class="qsub">严格管控型</div>
+  </div>
+  <div class="col-header" style="--accent:#6a9e56">
+    <div class="qtype">象限 II · 辅助OECM</div>
+    <div class="qlabel">高保护<br>高发展</div>
+    <div class="qsub">弹性共管型</div>
+  </div>
+  <div class="col-header" style="--accent:#c4834a">
+    <div class="qtype">象限 III · 修复优先</div>
+    <div class="qlabel">低保护<br>低发展</div>
+    <div class="qsub">修复培育型</div>
+  </div>
+  <div class="col-header" style="--accent:#b05878">
+    <div class="qtype">象限 IV · 发展引导</div>
+    <div class="qlabel">低保护<br>高发展</div>
+    <div class="qsub">绿色转型型</div>
+  </div>
+      <div class="row-header" style="--row:#4a6741"><span>自然保育地</span></div>
+        <button class="unit-card cell-1" 
+          data-r="0" data-c="0"
+          aria-label="打开 核心严育单元 详细说明">
+          <div class="thumb-wrap"><img src="assets/unit_1_1.png" alt="核心严育单元轴测图"></div>
+          <div class="unit-info">
+            <div class="unit-name">核心严育单元</div>
+            <div class="unit-tags">严格管控型 · 自然保育地</div>
+          </div>
+        </button>
+        <button class="unit-card cell-2" 
+          data-r="0" data-c="1"
+          aria-label="打开 生境协议共管单元 详细说明">
+          <div class="thumb-wrap"><img src="assets/unit_1_2.png" alt="生境协议共管单元轴测图"></div>
+          <div class="unit-info">
+            <div class="unit-name">生境协议共管单元</div>
+            <div class="unit-tags">弹性共管型 · 自然保育地</div>
+          </div>
+        </button>
+        <button class="unit-card cell-3" 
+          data-r="0" data-c="2"
+          aria-label="打开 生境修复培育单元 详细说明">
+          <div class="thumb-wrap"><img src="assets/unit_1_3.png" alt="生境修复培育单元轴测图"></div>
+          <div class="unit-info">
+            <div class="unit-name">生境修复培育单元</div>
+            <div class="unit-tags">修复培育型 · 自然保育地</div>
+          </div>
+        </button>
+        <button class="unit-card cell-4" 
+          data-r="0" data-c="3"
+          aria-label="打开 生境保育底线单元 详细说明">
+          <div class="thumb-wrap"><img src="assets/unit_1_4.png" alt="生境保育底线单元轴测图"></div>
+          <div class="unit-info">
+            <div class="unit-name">生境保育底线单元</div>
+            <div class="unit-tags">绿色转型型 · 自然保育地</div>
+          </div>
+        </button><div class="row-header" style="--row:#3f6275"><span>水域保育地</span></div>
+        <button class="unit-card cell-1" 
+          data-r="1" data-c="0"
+          aria-label="打开 水源涵养严护单元 详细说明">
+          <div class="thumb-wrap"><img src="assets/unit_2_1.png" alt="水源涵养严护单元轴测图"></div>
+          <div class="unit-info">
+            <div class="unit-name">水源涵养严护单元</div>
+            <div class="unit-tags">严格管控型 · 水域保育地</div>
+          </div>
+        </button>
+        <button class="unit-card cell-2" 
+          data-r="1" data-c="1"
+          aria-label="打开 水域弹性共管单元 详细说明">
+          <div class="thumb-wrap"><img src="assets/unit_2_2.png" alt="水域弹性共管单元轴测图"></div>
+          <div class="unit-info">
+            <div class="unit-name">水域弹性共管单元</div>
+            <div class="unit-tags">弹性共管型 · 水域保育地</div>
+          </div>
+        </button>
+        <button class="unit-card cell-3" 
+          data-r="1" data-c="2"
+          aria-label="打开 水域生态修复单元 详细说明">
+          <div class="thumb-wrap"><img src="assets/unit_2_3.png" alt="水域生态修复单元轴测图"></div>
+          <div class="unit-info">
+            <div class="unit-name">水域生态修复单元</div>
+            <div class="unit-tags">修复培育型 · 水域保育地</div>
+          </div>
+        </button>
+        <button class="unit-card cell-4" 
+          data-r="1" data-c="3"
+          aria-label="打开 水域功能保障单元 详细说明">
+          <div class="thumb-wrap"><img src="assets/unit_2_4.png" alt="水域功能保障单元轴测图"></div>
+          <div class="unit-info">
+            <div class="unit-name">水域功能保障单元</div>
+            <div class="unit-tags">绿色转型型 · 水域保育地</div>
+          </div>
+        </button><div class="row-header" style="--row:#7a7040"><span>生态友好农田</span></div>
+        <button class="unit-card cell-1" 
+          data-r="2" data-c="0"
+          aria-label="打开 野境共存严护单元 详细说明">
+          <div class="thumb-wrap"><img src="assets/unit_3_1.png" alt="野境共存严护单元轴测图"></div>
+          <div class="unit-info">
+            <div class="unit-name">野境共存严护单元</div>
+            <div class="unit-tags">严格管控型 · 生态友好农田</div>
+          </div>
+        </button>
+        <button class="unit-card cell-2" 
+          data-r="2" data-c="1"
+          aria-label="打开 人兽共存示范单元 详细说明">
+          <div class="thumb-wrap"><img src="assets/unit_3_2.png" alt="人兽共存示范单元轴测图"></div>
+          <div class="unit-info">
+            <div class="unit-name">人兽共存示范单元</div>
+            <div class="unit-tags">弹性共管型 · 生态友好农田</div>
+          </div>
+        </button>
+        <button class="unit-card cell-3" 
+          data-r="2" data-c="2"
+          aria-label="打开 农田生态培育单元 详细说明">
+          <div class="thumb-wrap"><img src="assets/unit_3_3.png" alt="农田生态培育单元轴测图"></div>
+          <div class="unit-info">
+            <div class="unit-name">农田生态培育单元</div>
+            <div class="unit-tags">修复培育型 · 生态友好农田</div>
+          </div>
+        </button>
+        <button class="unit-card cell-4" 
+          data-r="2" data-c="3"
+          aria-label="打开 农田绿色转型单元 详细说明">
+          <div class="thumb-wrap"><img src="assets/unit_3_4.png" alt="农田绿色转型单元轴测图"></div>
+          <div class="unit-info">
+            <div class="unit-name">农田绿色转型单元</div>
+            <div class="unit-tags">绿色转型型 · 生态友好农田</div>
+          </div>
+        </button><div class="row-header" style="--row:#6b5845"><span>聚落保育地</span></div>
+        <button class="unit-card cell-1" 
+          data-r="3" data-c="0"
+          aria-label="打开 山村生态守护单元 详细说明">
+          <div class="thumb-wrap"><img src="assets/unit_4_1.png" alt="山村生态守护单元轴测图"></div>
+          <div class="unit-info">
+            <div class="unit-name">山村生态守护单元</div>
+            <div class="unit-tags">严格管控型 · 聚落保育地</div>
+          </div>
+        </button>
+        <button class="unit-card cell-2" 
+          data-r="3" data-c="1"
+          aria-label="打开 社区弹性共管单元 详细说明">
+          <div class="thumb-wrap"><img src="assets/unit_4_2.png" alt="社区弹性共管单元轴测图"></div>
+          <div class="unit-info">
+            <div class="unit-name">社区弹性共管单元</div>
+            <div class="unit-tags">弹性共管型 · 聚落保育地</div>
+          </div>
+        </button>
+        <button class="unit-card cell-3" 
+          data-r="3" data-c="2"
+          aria-label="打开 聚落生态引导单元 详细说明">
+          <div class="thumb-wrap"><img src="assets/unit_4_3.png" alt="聚落生态引导单元轴测图"></div>
+          <div class="unit-info">
+            <div class="unit-name">聚落生态引导单元</div>
+            <div class="unit-tags">修复培育型 · 聚落保育地</div>
+          </div>
+        </button>
+        <button class="unit-card cell-4" 
+          data-r="3" data-c="3"
+          aria-label="打开 聚落绿色发展单元 详细说明">
+          <div class="thumb-wrap"><img src="assets/unit_4_4.png" alt="聚落绿色发展单元轴测图"></div>
+          <div class="unit-info">
+            <div class="unit-name">聚落绿色发展单元</div>
+            <div class="unit-tags">绿色转型型 · 聚落保育地</div>
+          </div>
+        </button>
+    </section>
+  </main>
+
+  <section class="legend">
+    <strong style="color:#555;">图例：</strong>
+    <span class="legend-item"><span class="dot" style="background:#3d6b35"></span>高保护-低发展｜主要 OECM</span>
+    <span class="legend-item"><span class="dot" style="background:#6a9e56"></span>高保护-高发展｜辅助 OECM</span>
+    <span class="legend-item"><span class="dot" style="background:#c4834a"></span>低保护-低发展｜修复优先</span>
+    <span class="legend-item"><span class="dot" style="background:#b05878"></span>低保护-高发展｜发展引导</span>
+  </section>
+
+  <div class="footnote">
+    注：本工具包以阜平县潜力 OECM 空间落位为基础，结合生态保护价值—经济发展潜力象限分类与 OECM 地类类型分类双轴体系构建。各单元规划措施以治理机制为框架、以用途管控与活动引导为内容，两轴叠合使用。
+  </div>
+</div>
+
+<dialog id="detailDialog">
+  <div class="modal" id="modalContent"></div>
+</dialog>
+
+<script>
+const details = [
+  {
+    "r": 0,
+    "c": 0,
+    "unit": "核心严育单元",
+    "row": "自然保育地",
+    "colType": "象限 I · 主要OECM",
+    "colLabel": "高保护-低发展",
+    "colSub": "严格管控型",
+    "color": "#3d6b35",
+    "img": "assets/unit_1_1.png",
+    "measures": [
+      "纳入统一巡护监测体系，参照自然保护区核心区标准实施严格管控，禁止一切商业开发",
+      "仅允许科学考察与必要保育干预活动，限制非科研人员进入",
+      "优先申请纳入国家OECM数据库，作为区域30×30目标的核心面积贡献单元"
+    ]
+  },
+  {
+    "r": 0,
+    "c": 1,
+    "unit": "生境协议共管单元",
+    "row": "自然保育地",
+    "colType": "象限 II · 辅助OECM",
+    "colLabel": "高保护-高发展",
+    "colSub": "弹性共管型",
+    "color": "#6a9e56",
+    "img": "assets/unit_1_2.png",
+    "measures": [
+      "建立政府-社区-经营主体三方协议保护框架，以生态承载容量阈值作为兼容利用硬约束",
+      "实行预约制准入，可开放低强度自然观察、森林徒步与主题自然教育活动",
+      "超容量活动触发限流机制，协议到期依据成效评估决定续签方案"
+    ]
+  },
+  {
+    "r": 0,
+    "c": 2,
+    "unit": "生境修复培育单元",
+    "row": "自然保育地",
+    "colType": "象限 III · 修复优先",
+    "colLabel": "低保护-低发展",
+    "colSub": "修复培育型",
+    "color": "#c4834a",
+    "img": "assets/unit_1_3.png",
+    "measures": [
+      "以廊道连通为核心目标制定植被恢复计划，优先选用乡土物种实施近自然修复",
+      "建立修复成效阶梯式评估体系，关键指标达标后自动触发OECM认定升级程序",
+      "探索碳汇开发协同推进，为修复工程提供持续市场化资金来源"
+    ]
+  },
+  {
+    "r": 0,
+    "c": 3,
+    "unit": "生境保育底线单元",
+    "row": "自然保育地",
+    "colType": "象限 IV · 发展引导",
+    "colLabel": "低保护-高发展",
+    "colSub": "绿色转型型",
+    "color": "#b05878",
+    "img": "assets/unit_1_4.png",
+    "measures": [
+      "划定开发活动空间禁入线，防止外部建设压力侵蚀残余自然植被斑块",
+      "要求周边开发项目履行生态影响评估，并承担等面积生态修复补偿义务",
+      "以负面清单明确禁止业态，引导开发项目在空间上绕避该单元"
+    ]
+  },
+  {
+    "r": 1,
+    "c": 0,
+    "unit": "水源涵养严护单元",
+    "row": "水域保育地",
+    "colType": "象限 I · 主要OECM",
+    "colLabel": "高保护-低发展",
+    "colSub": "严格管控型",
+    "color": "#3d6b35",
+    "img": "assets/unit_2_1.png",
+    "measures": [
+      "划定分级水岸缓冲带，实施严格入河污染管控，保障水生生境完整性与水文过程连续",
+      "禁止商业捕捞及一切水面开发活动，禁止改变河床形态的水利工程建设",
+      "重点维育黑鹳、中华秋沙鸭等珍稀水鸟的繁殖与越冬栖息环境"
+    ]
+  },
+  {
+    "r": 1,
+    "c": 1,
+    "unit": "水域弹性共管单元",
+    "row": "水域保育地",
+    "colType": "象限 II · 辅助OECM",
+    "colLabel": "高保护-高发展",
+    "colSub": "弹性共管型",
+    "color": "#6a9e56",
+    "img": "assets/unit_2_2.png",
+    "measures": [
+      "通过协议保护管控水上活动强度，设定承载容量并实行繁殖季节性强制限流",
+      "在非敏感时段开放观鸟、生态摄影、滨水写生与溯溪体验等低扰动活动",
+      "建立周边经营主体生态补偿缴纳机制，资金专项反哺水域日常管护"
+    ]
+  },
+  {
+    "r": 1,
+    "c": 2,
+    "unit": "水域生态修复单元",
+    "row": "水域保育地",
+    "colType": "象限 III · 修复优先",
+    "colLabel": "低保护-低发展",
+    "colSub": "修复培育型",
+    "color": "#c4834a",
+    "img": "assets/unit_2_3.png",
+    "measures": [
+      "清理违规排污源头，实施水岸植被缓冲带建设与退化湿地水文条件恢复工程",
+      "建立水质与水生生物多样性双轨监测机制，定期追踪修复进程",
+      "修复成效达标后启动向水源涵养严护单元的升级认定程序"
+    ]
+  },
+  {
+    "r": 1,
+    "c": 3,
+    "unit": "水域功能保障单元",
+    "row": "水域保育地",
+    "colType": "象限 IV · 发展引导",
+    "colLabel": "低保护-高发展",
+    "colSub": "绿色转型型",
+    "color": "#b05878",
+    "img": "assets/unit_2_4.png",
+    "measures": [
+      "设定水体开发利用总量上限，禁止工业取水、污水排放及影响水文的硬化工程",
+      "允许有序开展滨水休闲与旅游活动，设定并严守承载容量底线",
+      "以水质底线红线为核心管控抓手，低于设定标准时立即触发限流与整改机制"
+    ]
+  },
+  {
+    "r": 2,
+    "c": 0,
+    "unit": "野境共存严护单元",
+    "row": "生态友好农田",
+    "colType": "象限 I · 主要OECM",
+    "colLabel": "高保护-低发展",
+    "colSub": "严格管控型",
+    "color": "#3d6b35",
+    "img": "assets/unit_3_1.png",
+    "measures": [
+      "建立野生动物损害补偿机制，鼓励农户主动接纳并保留农田作为野生动物缓冲带的生态功能",
+      "纳入巡护监测体系，系统记录野生动物进入频次与行为，作为物种种群动态长期数据",
+      "严格限制农田扩张及农业基础设施新建，保持森林-农田过渡带的空间连续与生态完整"
+    ]
+  },
+  {
+    "r": 2,
+    "c": 1,
+    "unit": "人兽共存示范单元",
+    "row": "生态友好农田",
+    "colType": "象限 II · 辅助OECM",
+    "colLabel": "高保护-高发展",
+    "colSub": "弹性共管型",
+    "color": "#6a9e56",
+    "img": "assets/unit_3_2.png",
+    "measures": [
+      "建立“豹乡田”品牌认证体系，推动农产品生态溢价，将农户对野生动物的容忍转化为可持续收益",
+      "开展以人兽共存为主题的自然教育、公众科学参与及生态摄影等活动",
+      "通过协议保护规范农业经营方式，禁止使用对野生动物高毒农药，实施友好型农业管理"
+    ]
+  },
+  {
+    "r": 2,
+    "c": 2,
+    "unit": "农田生态培育单元",
+    "row": "生态友好农田",
+    "colType": "象限 III · 修复优先",
+    "colLabel": "低保护-低发展",
+    "colSub": "修复培育型",
+    "color": "#c4834a",
+    "img": "assets/unit_3_3.png",
+    "measures": [
+      "推广减少化肥农药投入，逐步引导农业生产方式向生态友好型转型",
+      "保留田埂草带、农田防护林带等生境结构要素，恢复农田生物多样性本底",
+      "作为人兽共存缓冲区潜力地块加以培育，条件成熟后纳入OECM认定体系"
+    ]
+  },
+  {
+    "r": 2,
+    "c": 3,
+    "unit": "农田绿色转型单元",
+    "row": "生态友好农田",
+    "colType": "象限 IV · 发展引导",
+    "colLabel": "低保护-高发展",
+    "colSub": "绿色转型型",
+    "color": "#b05878",
+    "img": "assets/unit_3_4.png",
+    "measures": [
+      "引导农业生产向有机绿色方向转型，对接区域生态农产品品牌体系",
+      "在景观条件较好的区域适度发展农耕体验、田园观光与乡土文化展示活动",
+      "以准入负面清单限制高强度农业设施建设，防止人为扰动进一步加剧"
+    ]
+  },
+  {
+    "r": 3,
+    "c": 0,
+    "unit": "山村生态守护单元",
+    "row": "聚落保育地",
+    "colType": "象限 I · 主要OECM",
+    "colLabel": "高保护-低发展",
+    "colSub": "严格管控型",
+    "color": "#3d6b35",
+    "img": "assets/unit_4_1.png",
+    "measures": [
+      "严格划定村庄建设增长边界，禁止向周边山地自然植被区和河谷湿地蔓延扩张",
+      "设立生态管护员岗位，将居民纳入保育巡护体系，通过生态补偿资金支付管护报酬",
+      "对古树名木、传统石砌建筑、梯田等具有生境与文化价值的乡土遗产实施原址保护"
+    ]
+  },
+  {
+    "r": 3,
+    "c": 1,
+    "unit": "社区弹性共管单元",
+    "row": "聚落保育地",
+    "colType": "象限 II · 辅助OECM",
+    "colLabel": "高保护-高发展",
+    "colSub": "弹性共管型",
+    "color": "#6a9e56",
+    "img": "assets/unit_4_2.png",
+    "measures": [
+      "建立三方协议保护框架，明确社区参与共管权责，保障居民从保护活动中获取收益",
+      "在控制规模前提下发展生态民宿、艺术写生基地、传统手工艺体验及乡村文化活动",
+      "旅游收益按比例反哺OECM管护基金，实现保护与社区发展的良性循环"
+    ]
+  },
+  {
+    "r": 3,
+    "c": 2,
+    "unit": "聚落生态引导单元",
+    "row": "聚落保育地",
+    "colType": "象限 III · 修复优先",
+    "colLabel": "低保护-低发展",
+    "colSub": "修复培育型",
+    "color": "#c4834a",
+    "img": "assets/unit_4_3.png",
+    "measures": [
+      "控制建设蔓延，推进聚落周边裸地和退化地的植被恢复工程",
+      "引导闲置宅基地复绿，推广村庄绿地生态化管理标准，提升聚落生态底质",
+      "作为社区弹性共管单元的培育对象，条件成熟后纳入OECM认定体系"
+    ]
+  },
+  {
+    "r": 3,
+    "c": 3,
+    "unit": "聚落绿色发展单元",
+    "row": "聚落保育地",
+    "colType": "象限 IV · 发展引导",
+    "colLabel": "低保护-高发展",
+    "colSub": "绿色转型型",
+    "color": "#b05878",
+    "img": "assets/unit_4_4.png",
+    "measures": [
+      "划定建设增长边界，引导新增建设在现有建成区内部集约消化，禁止向生态用地蔓延",
+      "优先发展生态旅游服务配套、特色民宿、文化创意、绿色手工业等低扰动产业",
+      "制定产业准入负面清单，禁止高污染、高扰动项目在聚落及周边落地"
+    ]
+  }
+];
+const dialog = document.getElementById('detailDialog');
+const modal = document.getElementById('modalContent');
+
+function openDetail(r, c) {
+  const d = details.find(item => item.r === r && item.c === c);
+  if (!d) return;
+  modal.style.setProperty('--modal-color', d.color);
+  modal.innerHTML = `
+    <div class="modal-visual">
+      <img src="${d.img}" alt="${d.unit}轴测图">
+    </div>
+    <div class="modal-text">
+      <button class="close" onclick="dialog.close()" aria-label="关闭">×</button>
+      <div class="modal-kicker">${d.colType}</div>
+      <h2 class="modal-title">${d.unit}</h2>
+      <div class="modal-sub">${d.row} · ${d.colLabel} · ${d.colSub}</div>
+      <div class="measure-title">管控措施与活动展望</div>
+      <ul class="measure-list">
+        ${d.measures.map(m => `<li>${m}</li>`).join('')}
+      </ul>
+      <div class="modal-footer">
+        该单元由“地类类型”和“生态保护价值—经济发展潜力象限”叠合形成，可作为空间落位后的综合管控指引。
+      </div>
+    </div>
+  `;
+  dialog.showModal();
+}
+
+document.querySelectorAll('.unit-card').forEach(card => {
+  card.addEventListener('click', () => openDetail(Number(card.dataset.r), Number(card.dataset.c)));
+});
+
+dialog.addEventListener('click', (event) => {
+  const rect = dialog.getBoundingClientRect();
+  const isInDialog = rect.top <= event.clientY && event.clientY <= rect.top + rect.height &&
+                     rect.left <= event.clientX && event.clientX <= rect.left + rect.width;
+  if (!isInDialog) dialog.close();
+});
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && dialog.open) dialog.close();
+});
+</script>
+</body>
+</html>
