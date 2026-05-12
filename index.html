@@ -228,22 +228,18 @@
       <div class="corner">双轴分类</div>
       
   <div class="col-header" style="--accent:#3d6b35">
-    <div class="qtype">象限 I · 主要OECM</div>
     <div class="qlabel">高保护<br>低发展</div>
     <div class="qsub">严格管控型</div>
   </div>
   <div class="col-header" style="--accent:#6a9e56">
-    <div class="qtype">象限 II · 辅助OECM</div>
     <div class="qlabel">高保护<br>高发展</div>
     <div class="qsub">弹性共管型</div>
   </div>
   <div class="col-header" style="--accent:#c4834a">
-    <div class="qtype">象限 III · 修复优先</div>
     <div class="qlabel">低保护<br>低发展</div>
     <div class="qsub">修复培育型</div>
   </div>
   <div class="col-header" style="--accent:#b05878">
-    <div class="qtype">象限 IV · 发展引导</div>
     <div class="qlabel">低保护<br>高发展</div>
     <div class="qsub">绿色转型型</div>
   </div>
@@ -389,10 +385,10 @@
 
   <section class="legend">
     <strong style="color:#555;">图例：</strong>
-    <span class="legend-item"><span class="dot" style="background:#3d6b35"></span>高保护-低发展｜主要 OECM</span>
-    <span class="legend-item"><span class="dot" style="background:#6a9e56"></span>高保护-高发展｜辅助 OECM</span>
-    <span class="legend-item"><span class="dot" style="background:#c4834a"></span>低保护-低发展｜修复优先</span>
-    <span class="legend-item"><span class="dot" style="background:#b05878"></span>低保护-高发展｜发展引导</span>
+    <span class="legend-item"><span class="dot" style="background:#3d6b35"></span>高保护-低发展</span>
+    <span class="legend-item"><span class="dot" style="background:#6a9e56"></span>高保护-高发展</span>
+    <span class="legend-item"><span class="dot" style="background:#c4834a"></span>低保护-低发展</span>
+    <span class="legend-item"><span class="dot" style="background:#b05878"></span>低保护-高发展</span>
   </section>
 
   <div class="footnote">
@@ -411,7 +407,7 @@ const details = [
     "c": 0,
     "unit": "核心严育单元",
     "row": "自然保育地",
-    "colType": "象限 I · 主要OECM",
+    "colType": "1-1",
     "colLabel": "高保护-低发展",
     "colSub": "严格管控型",
     "color": "#3d6b35",
@@ -427,7 +423,7 @@ const details = [
     "c": 1,
     "unit": "生境协议共管单元",
     "row": "自然保育地",
-    "colType": "象限 II · 辅助OECM",
+    "colType": "1-2",
     "colLabel": "高保护-高发展",
     "colSub": "弹性共管型",
     "color": "#6a9e56",
@@ -443,7 +439,7 @@ const details = [
     "c": 2,
     "unit": "生境修复培育单元",
     "row": "自然保育地",
-    "colType": "象限 III · 修复优先",
+    "colType": "1-3",
     "colLabel": "低保护-低发展",
     "colSub": "修复培育型",
     "color": "#c4834a",
@@ -459,7 +455,7 @@ const details = [
     "c": 3,
     "unit": "生境保育底线单元",
     "row": "自然保育地",
-    "colType": "象限 IV · 发展引导",
+    "colType": "1-4",
     "colLabel": "低保护-高发展",
     "colSub": "绿色转型型",
     "color": "#b05878",
@@ -475,7 +471,7 @@ const details = [
     "c": 0,
     "unit": "水源涵养严护单元",
     "row": "水域保育地",
-    "colType": "象限 I · 主要OECM",
+    "colType": "2-1",
     "colLabel": "高保护-低发展",
     "colSub": "严格管控型",
     "color": "#3d6b35",
@@ -491,7 +487,7 @@ const details = [
     "c": 1,
     "unit": "水域弹性共管单元",
     "row": "水域保育地",
-    "colType": "象限 II · 辅助OECM",
+    "colType": "2-2",
     "colLabel": "高保护-高发展",
     "colSub": "弹性共管型",
     "color": "#6a9e56",
@@ -507,7 +503,7 @@ const details = [
     "c": 2,
     "unit": "水域生态修复单元",
     "row": "水域保育地",
-    "colType": "象限 III · 修复优先",
+    "colType": "2-3",
     "colLabel": "低保护-低发展",
     "colSub": "修复培育型",
     "color": "#c4834a",
@@ -523,7 +519,7 @@ const details = [
     "c": 0,
     "unit": "野境共存严护单元",
     "row": "生态友好农田",
-    "colType": "象限 I · 主要OECM",
+    "colType": "3-1",
     "colLabel": "高保护-低发展",
     "colSub": "严格管控型",
     "color": "#3d6b35",
@@ -539,7 +535,7 @@ const details = [
     "c": 1,
     "unit": "人兽共存示范单元",
     "row": "生态友好农田",
-    "colType": "象限 II · 辅助OECM",
+    "colType": "3-2",
     "colLabel": "高保护-高发展",
     "colSub": "弹性共管型",
     "color": "#6a9e56",
@@ -555,7 +551,7 @@ const details = [
     "c": 2,
     "unit": "农田生态培育单元",
     "row": "生态友好农田",
-    "colType": "象限 III · 修复优先",
+    "colType": "3-3",
     "colLabel": "低保护-低发展",
     "colSub": "修复培育型",
     "color": "#c4834a",
@@ -571,7 +567,7 @@ const details = [
     "c": 3,
     "unit": "农田绿色转型单元",
     "row": "生态友好农田",
-    "colType": "象限 IV · 发展引导",
+    "colType": "3-4",
     "colLabel": "低保护-高发展",
     "colSub": "绿色转型型",
     "color": "#b05878",
@@ -587,7 +583,7 @@ const details = [
     "c": 0,
     "unit": "山村生态守护单元",
     "row": "聚落保育地",
-    "colType": "象限 I · 主要OECM",
+    "colType": "4-1",
     "colLabel": "高保护-低发展",
     "colSub": "严格管控型",
     "color": "#3d6b35",
@@ -603,7 +599,7 @@ const details = [
     "c": 1,
     "unit": "社区弹性共管单元",
     "row": "聚落保育地",
-    "colType": "象限 II · 辅助OECM",
+    "colType": "4-2",
     "colLabel": "高保护-高发展",
     "colSub": "弹性共管型",
     "color": "#6a9e56",
@@ -619,7 +615,7 @@ const details = [
     "c": 2,
     "unit": "聚落生态引导单元",
     "row": "聚落保育地",
-    "colType": "象限 III · 修复优先",
+    "colType": "4-3",
     "colLabel": "低保护-低发展",
     "colSub": "修复培育型",
     "color": "#c4834a",
@@ -635,7 +631,7 @@ const details = [
     "c": 3,
     "unit": "聚落绿色发展单元",
     "row": "聚落保育地",
-    "colType": "象限 IV · 发展引导",
+    "colType": "4-4",
     "colLabel": "低保护-高发展",
     "colSub": "绿色转型型",
     "color": "#b05878",
