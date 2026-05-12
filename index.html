@@ -110,6 +110,12 @@
     transform:translateY(-3px);
     box-shadow:0 16px 36px rgba(0,0,0,.12);
   }
+  .empty-cell {
+    border-radius:12px;
+    min-height:226px;
+    background:rgba(255,253,248,.35);
+    border:1px dashed rgba(215,209,196,.65);
+  }
   .cell-1 { background:var(--c1-light); border-color:var(--c1-mid); }
   .cell-2 { background:var(--c2-light); border-color:var(--c2-mid); }
   .cell-3 { background:var(--c3-light); border-color:var(--c3-mid); }
@@ -198,9 +204,9 @@
     <div>
       <div class="header-tag">阜平县 · OECM 规划工具包</div>
       <h1>潜力 OECM 分区管控矩阵</h1>
-      <p class="intro">依据生态保护价值—经济发展潜力象限与 OECM 地类类型双轴分类体系，形成 16 类管控单元。点击任一工具包轴测图，可展开原始详细管控措施与活动展望。</p>
+      <p class="intro">依据生态保护价值—经济发展潜力象限与 OECM 地类类型双轴分类体系，形成 15 类管控单元。点击任一工具包轴测图，可展开原始详细管控措施与活动展望。</p>
     </div>
-    <div class="hint">点击 16 个工具包卡片查看详细说明</div>
+    <div class="hint">点击工具包卡片查看详细说明</div>
   </header>
 
   <div class="axis-x-label">经济发展潜力 →</div>
@@ -305,15 +311,7 @@
             <div class="unit-tags">修复培育型 · 水域保育地</div>
           </div>
         </button>
-        <button class="unit-card cell-4" 
-          data-r="1" data-c="3"
-          aria-label="打开 水域功能保障单元 详细说明">
-          <div class="thumb-wrap"><img src="assets/unit_2_4.png" alt="水域功能保障单元轴测图"></div>
-          <div class="unit-info">
-            <div class="unit-name">水域功能保障单元</div>
-            <div class="unit-tags">绿色转型型 · 水域保育地</div>
-          </div>
-        </button><div class="row-header" style="--row:#7a7040"><span>生态友好农田</span></div>
+        <div class="empty-cell" aria-hidden="true"></div><div class="row-header" style="--row:#7a7040"><span>生态友好农田</span></div>
         <button class="unit-card cell-1" 
           data-r="2" data-c="0"
           aria-label="打开 野境共存严护单元 详细说明">
@@ -518,22 +516,6 @@ const details = [
       "清理违规排污源头，实施水岸植被缓冲带建设与退化湿地水文条件恢复工程",
       "建立水质与水生生物多样性双轨监测机制，定期追踪修复进程",
       "修复成效达标后启动向水源涵养严护单元的升级认定程序"
-    ]
-  },
-  {
-    "r": 1,
-    "c": 3,
-    "unit": "水域功能保障单元",
-    "row": "水域保育地",
-    "colType": "象限 IV · 发展引导",
-    "colLabel": "低保护-高发展",
-    "colSub": "绿色转型型",
-    "color": "#b05878",
-    "img": "assets/unit_2_4.png",
-    "measures": [
-      "设定水体开发利用总量上限，禁止工业取水、污水排放及影响水文的硬化工程",
-      "允许有序开展滨水休闲与旅游活动，设定并严守承载容量底线",
-      "以水质底线红线为核心管控抓手，低于设定标准时立即触发限流与整改机制"
     ]
   },
   {
